@@ -1,12 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const WarnErrorMessage = ({ tryFn }) => {
-  return (
-    <div>
-      <h3>Failed to fetch</h3>
-      <button onClick={tryFn}>Try again</button>
-    </div>
-  );
+const WarnErrorMessage = ({ handleTryFn }) => (
+  <div>
+    <h3>Failed to fetch</h3>
+    <button type='button' onClick={handleTryFn}>Try again</button>
+  </div>
+);
+
+WarnErrorMessage.propTypes = {
+  handleTryFn: PropTypes.func.isRequired,
 };
 
 export default WarnErrorMessage;

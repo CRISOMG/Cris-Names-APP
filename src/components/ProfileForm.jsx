@@ -13,11 +13,12 @@ import Spinner from './Spinner';
 import WarnErrorMessage from './WarnErrorMessage';
 
 const ProfileForm = (props) => {
-  const { profileUrl, isEdit, redirect } = props;
+  const { profileId, isEdit, redirect } = props;
   const { loading, error } = props.request;
   const {
     getProfile, createProfile, updateProfile, deleteProfile,
   } = props;
+  const { setLoading } = props;
 
   const [profile, setProfile] = useState({
     name: '',
@@ -25,14 +26,19 @@ const ProfileForm = (props) => {
   });
 
   const controller = new AbortController();
-  const { signal } = controller;
 
   useEffect(() => {
-    getProfile({
-      isEdit, setProfile, profileUrl, signal,
-    });
-
-    return () => controller.abort();
+    if (isEdit) {
+      getProfile({
+        isEdit,
+        setProfile,
+        profileId,
+        ...controller.signal,
+      });
+      return () => controller.abort();
+    }
+    setLoading(false);
+    return () => {};
   }, []);
 
   function handleInput(event) {
@@ -41,55 +47,66 @@ const ProfileForm = (props) => {
       [event.target.name]: event.target.value,
     });
   }
+  function handleButtons(event) {
+    const { name } = event.target;
+    switch (name) {
+      case 'create':
+        createProfile({ profile, redirect });
+        break;
+      case 'update':
+        updateProfile({ profileId, profile, redirect });
+        break;
+      case 'delete':
+        deleteProfile({ profileId, redirect });
+        break;
+
+      default:
+        break;
+    }
+  }
   return (
     <>
       {loading && <Spinner />}
-      {!loading && !error
-      && (
-      <>
-        <ProfileCard name={profile.name} lastname={profile.lastname} />
-        <form className='form'>
-          <div className='form__inputs'>
-            <input value={profile.name} name='name' onChange={handleInput} placeholder='Name' />
-            <input
-              value={profile.lastname}
-              name='lastname'
-              onChange={handleInput}
-              placeholder='Lastname'
-            />
-          </div>
-          <div className='form__buttoms'>
-            {isEdit ? (
-              <>
-                <button type='button' className='form__update-buttom' onClick={() => updateProfile({ profileUrl, profile, redirect })}>
-                  Update
+      {!loading && !error && (
+        <>
+          <ProfileCard name={profile.name} lastname={profile.lastname} />
+          <form className='form'>
+            <div className='form__inputs'>
+              <input value={profile.name} name='name' onChange={handleInput} placeholder='Name' />
+              <input value={profile.lastname} name='lastname' onChange={handleInput} placeholder='Lastname' />
+            </div>
+            <div className='form__buttoms'>
+              {isEdit ? (
+                <>
+                  <button type='button' name='update' className='form__update-buttom' onClick={handleButtons}>
+                    Update
+                  </button>
+                  <button type='button' name='delete' className='form__delete-buttom' onClick={handleButtons}>
+                    Delete
+                  </button>
+                </>
+              ) : (
+                <button type='button' name='create' className='form__create-buttom' onClick={handleButtons}>
+                  Send
                 </button>
-                <button type='button' className='form__delete-buttom' onClick={() => deleteProfile({ profileUrl, redirect })}>
-                  Delete
-                </button>
-              </>
-            ) : (
-              <button type='button' className='form__create-buttom' onClick={() => createProfile({ profile, redirect })}>
-                Send
-              </button>
-            )}
-          </div>
-        </form>
-      </>
+              )}
+            </div>
+          </form>
+        </>
       )}
-      {error && <WarnErrorMessage />}
+      {error && <WarnErrorMessage handleTryFn={() => {}} />}
     </>
   );
 };
 
 ProfileForm.propTypes = {
-  profileUrl: PropTypes.string,
+  profileId: PropTypes.string,
   isEdit: PropTypes.bool,
   redirect: PropTypes.func.isRequired,
 };
 
 ProfileForm.defaultProps = {
-  profileUrl: '/',
+  profileId: '/',
   isEdit: false,
 };
 

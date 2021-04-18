@@ -25,12 +25,12 @@ const Profiles = (props) => {
 
   return (
     <section className='profile__list'>
-      {request.error && !request.loading && <WarnErrorMessage tryFn={fetchProfiles} />}
+      {request.error && !request.loading && <WarnErrorMessage handleTryFn={fetchProfiles} />}
       {request.loading && <Spinner />}
-      {request.data &&
-        request.data.map((profile) => (
+      {request.data && !request.loading
+        && request.data.map((profile) => (
           // eslint-disable-next-line no-underscore-dangle
-          <Link key={profile.name} to={`/edit/${profile._id}`}>
+          <Link key={profile._id} to={`/edit/${profile._id}`}>
             <ProfileCard name={profile.name} lastname={profile.lastname} />
           </Link>
         ))}

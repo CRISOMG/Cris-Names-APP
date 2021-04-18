@@ -7,7 +7,7 @@ module.exports = {
   entry: ['@babel/polyfill', './src'],
   output: {
     path: path.resolve(__dirname, 'public'),
-    filename: 'bundle.js',
+    filename: '[name].js',
     publicPath: '/',
   },
   resolve: {
@@ -45,6 +45,11 @@ module.exports = {
       },
     ],
   },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
+  },
   devServer: {
     hot: true,
     historyApiFallback: true,
@@ -57,7 +62,7 @@ module.exports = {
       filename: 'index.html',
     }),
     new MiniCssExtractPlugin({
-      filename: 'style.css',
+      filename: '[name].css',
     }),
     new HotModuleReplacementPlugin(),
   ],
