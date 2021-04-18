@@ -5,14 +5,10 @@ import '../assets/styles/style.css';
 
 import ProfileForm from '../components/ProfileForm';
 
-const EditProfile = (props) => {
-  const url = `https://crud-names.now.sh/api/${props.match.params.id}`;
-
-  return (
-    <section className='edit-profile'>
-      <ProfileForm isEdit profileUrl={url} redirect={() => props.history.push('/')} />
-    </section>
-  );
-};
+const EditProfile = (props) => (
+  <section className='edit-profile'>
+    <ProfileForm isEdit profileId={props.match.params.id} redirect={() => props.history.push('/')} />
+  </section>
+);
 
 export default EditProfile;

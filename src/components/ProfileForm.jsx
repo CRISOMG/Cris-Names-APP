@@ -13,7 +13,7 @@ import Spinner from './Spinner';
 import WarnErrorMessage from './WarnErrorMessage';
 
 const ProfileForm = (props) => {
-  const { profileUrl, isEdit, redirect } = props;
+  const { profileId, isEdit, redirect } = props;
   const { loading, error } = props.request;
   const {
     getProfile, createProfile, updateProfile, deleteProfile,
@@ -29,7 +29,10 @@ const ProfileForm = (props) => {
 
   useEffect(() => {
     getProfile({
-      isEdit, setProfile, profileUrl, signal,
+      isEdit,
+      setProfile,
+      profileId,
+      signal,
     });
 
     return () => controller.abort();
@@ -44,38 +47,32 @@ const ProfileForm = (props) => {
   return (
     <>
       {loading && <Spinner />}
-      {!loading && !error
-      && (
-      <>
-        <ProfileCard name={profile.name} lastname={profile.lastname} />
-        <form className='form'>
-          <div className='form__inputs'>
-            <input value={profile.name} name='name' onChange={handleInput} placeholder='Name' />
-            <input
-              value={profile.lastname}
-              name='lastname'
-              onChange={handleInput}
-              placeholder='Lastname'
-            />
-          </div>
-          <div className='form__buttoms'>
-            {isEdit ? (
-              <>
-                <button type='button' className='form__update-buttom' onClick={() => updateProfile({ profileUrl, profile, redirect })}>
-                  Update
+      {!loading && !error && (
+        <>
+          <ProfileCard name={profile.name} lastname={profile.lastname} />
+          <form className='form'>
+            <div className='form__inputs'>
+              <input value={profile.name} name='name' onChange={handleInput} placeholder='Name' />
+              <input value={profile.lastname} name='lastname' onChange={handleInput} placeholder='Lastname' />
+            </div>
+            <div className='form__buttoms'>
+              {isEdit ? (
+                <>
+                  <button type='button' className='form__update-buttom' onClick={() => updateProfile({ profileId, profile, redirect })}>
+                    Update
+                  </button>
+                  <button type='button' className='form__delete-buttom' onClick={() => deleteProfile({ profileId, redirect })}>
+                    Delete
+                  </button>
+                </>
+              ) : (
+                <button type='button' className='form__create-buttom' onClick={() => createProfile({ profile, redirect })}>
+                  Send
                 </button>
-                <button type='button' className='form__delete-buttom' onClick={() => deleteProfile({ profileUrl, redirect })}>
-                  Delete
-                </button>
-              </>
-            ) : (
-              <button type='button' className='form__create-buttom' onClick={() => createProfile({ profile, redirect })}>
-                Send
-              </button>
-            )}
-          </div>
-        </form>
-      </>
+              )}
+            </div>
+          </form>
+        </>
       )}
       {error && <WarnErrorMessage />}
     </>
@@ -83,13 +80,13 @@ const ProfileForm = (props) => {
 };
 
 ProfileForm.propTypes = {
-  profileUrl: PropTypes.string,
+  profileId: PropTypes.string,
   isEdit: PropTypes.bool,
   redirect: PropTypes.func.isRequired,
 };
 
 ProfileForm.defaultProps = {
-  profileUrl: '/',
+  profileId: '/',
   isEdit: false,
 };
 

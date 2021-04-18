@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import * as types from '../types';
 
 export const setLoading = (payload) => ({
@@ -26,37 +27,46 @@ async function requestHandler(fn, dispatch) {
   }
 }
 
-const API = NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://cris-names-api.herokuapp.com';
+const API = process.env.NODE_ENV === 'development' ? 'http://localhost:3000/api' : 'https://cris-names-api.herokuapp.com/api';
 
-// eslint-disable-next-line no-unused-vars
 export const fetchProfiles = ({ signal }) => (dispatch, getState) => {
   if (getState().request.data) return;
 
   requestHandler(async () => {
-    const res = await fetch(API, { signal });
+    const res = await fetch(API, { mode: 'cors', signal });
     const d = await res.json();
     dispatch(setData(d));
   }, dispatch);
 };
 
-export const getProfile = (props) => (dispatch) => {
-  const { isEdit, setProfile, profileUrl, signal } = props;
+export const getProfile = (props) => (dispatch, getState) => {
+  const {
+    isEdit, setProfile, profileId, signal,
+  } = props;
   if (isEdit) {
-    requestHandler(async () => {
-      const res = await fetch(profileUrl, { signal });
-      const data = await res.json();
+    const currentState = getState().request.data;
+    if (currentState) {
+      const profileFromState = currentState.find((profile) => profile._id === profileId);
       setProfile({
-        name: data.name,
-        lastname: data.lastname,
+        name: profileFromState.name,
+        lastname: profileFromState.lastname,
       });
-    }, dispatch);
+    } else {
+      requestHandler(async () => {
+        const res = await fetch(`${API}/${profileId}`, { mode: 'cors', signal });
+        const data = await res.json();
+        setProfile({
+          name: data.name,
+          lastname: data.lastname,
+        });
+      }, dispatch);
+    }
   }
 };
 
 export const createProfile = ({
   profile,
   redirect,
-  // eslint-disable-next-line no-unused-vars
 }) => (dispatch, getState) => {
   requestHandler(async () => {
     const res = await fetch(API, {
@@ -67,16 +77,24 @@ export const createProfile = ({
         'content-type': 'application/json',
       },
     });
-    const d = await res.json();
-    dispatch(setData([...d]));
+    const id = await res.json();
+    const profileCreated = {
+      _id: id,
+      ...profile,
+    };
+    const newState = [
+      ...getState().request.data,
+      profileCreated,
+    ];
+    dispatch(setData(newState));
 
     redirect();
   }, dispatch);
 };
 
-export const updateProfile = ({ profileUrl, profile, redirect }) => (dispatch) => {
+export const updateProfile = ({ profileId, profile, redirect }) => (dispatch, getState) => {
   requestHandler(async () => {
-    await fetch(profileUrl, {
+    await fetch(`${API}/${profileId}`, {
       mode: 'cors',
       method: 'PUT',
       body: JSON.stringify(profile),
@@ -84,15 +102,28 @@ export const updateProfile = ({ profileUrl, profile, redirect }) => (dispatch) =
         'content-type': 'application/json',
       },
     });
+    const newState = getState().request.data.map((profileFromState) => {
+      if (profileFromState._id === profileId) {
+        return {
+          ...profileFromState,
+          ...profile,
+        };
+      }
+      return profileFromState;
+    });
+    dispatch(setData(newState));
     redirect();
   }, dispatch);
 };
 
-export const deleteProfile = ({ profileUrl, redirect }) => (dispatch) => {
+export const deleteProfile = ({ profileId, redirect }) => (dispatch, getState) => {
   requestHandler(async () => {
-    await fetch(profileUrl, {
+    await fetch(`${API}/${profileId}`, {
+      mode: 'cors',
       method: 'DELETE',
     });
+    const newState = getState().request.data.filter((profile) => profile._id !== profileId);
+    dispatch(setData(newState));
     redirect();
   }, dispatch);
 };
