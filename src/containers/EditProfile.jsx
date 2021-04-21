@@ -1,7 +1,5 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable react/destructuring-assignment */
+/* eslint-disable react/prop-types, react/destructuring-assignment */
 import React from 'react';
-import '../assets/styles/style.css';
 
 import ProfileForm from '../components/ProfileForm';
 

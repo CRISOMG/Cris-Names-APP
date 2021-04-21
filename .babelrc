@@ -1,4 +1,14 @@
 {
-  "presets": ["@babel/preset-env", "@babel/preset-react"],
-  "plugins": ["babel-plugin-styled-components"]
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "usage",
+        "corejs": "2.x"
+      }
+    ],
+    "@babel/preset-react"
+  ],
+  "plugins": ["babel-plugin-styled-components","@babel/plugin-syntax-dynamic-import"],
+  
 }

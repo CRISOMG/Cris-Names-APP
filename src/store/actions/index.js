@@ -1,7 +1,9 @@
-import * as requestActions from './request';
+import * as request from './request';
+import * as crud from './crud';
 
 const actions = {
-  requestActions,
+  request,
+  crud,
 };
 
 export default actions;

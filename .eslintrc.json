@@ -12,7 +12,7 @@
     "sourceType": "module"
   },
   "plugins": ["react"],
-  "ignorePatterns": ["./node_modules/**"],
+  "ignorePatterns": ["./node_modules/**","public"],
   "rules": {
     "jsx-quotes": ["error", "prefer-single"]
   }

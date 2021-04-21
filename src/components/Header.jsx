@@ -1,6 +1,7 @@
+/* eslint-disable import/no-unresolved */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../assets/styles/components/header.css';
+import '@styles/components/Header.css';
 
 const Header = () => (
   <header className='header'>
@@ -9,7 +10,7 @@ const Header = () => (
     </Link>
     <nav className='header__navbar'>
       <Link to='/create'>
-        <button className='header__buttonEdit'>Create</button>
+        <button type='button' className='header__buttonEdit'>Create</button>
       </Link>
     </nav>
   </header>

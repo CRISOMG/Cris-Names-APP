@@ -1,25 +1,26 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable import/no-unresolved */
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import PropTypes from 'prop-types';
+import actions from '@store/actions';
 
 import { connect } from 'react-redux';
-import ProfileCard from '../components/ProfileCard';
-import Spinner from '../components/Spinner';
+import ProfileCard from '@/components/ProfileCard';
+import Spinner from '@/components/Spinner';
 
-import WarnErrorMessage from '../components/WarnErrorMessage';
+import WarnErrorMessage from '@/components/WarnErrorMessage';
 
-import '../assets/styles/components/profile.css';
-import actions from '../store/actions';
+import '@styles/containers/Profiles.css';
 
 const Profiles = (props) => {
   const { request, fetchProfiles } = props;
 
   const controller = new AbortController();
-  const { signal } = controller;
 
   useEffect(() => {
-    fetchProfiles({ signal });
+    fetchProfiles({ ...controller.signal });
     return () => controller.abort();
   }, []);
 
@@ -29,10 +30,11 @@ const Profiles = (props) => {
       {request.loading && <Spinner />}
       {request.data && !request.loading
         && request.data.map((profile) => (
-          // eslint-disable-next-line no-underscore-dangle
-          <Link key={profile._id} to={`/edit/${profile._id}`}>
-            <ProfileCard name={profile.name} lastname={profile.lastname} />
-          </Link>
+          <div key={profile._id} style={{ margin: '8px' }}>
+            <Link to={`/edit/${profile._id}`}>
+              <ProfileCard name={profile.name} lastname={profile.lastname} />
+            </Link>
+          </div>
         ))}
     </section>
   );
@@ -48,7 +50,8 @@ const mapStateToProps = ({ request }) => ({
 });
 
 const mapDispatchToProps = {
-  ...actions.requestActions,
+  ...actions.request,
+  ...actions.crud,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profiles);
